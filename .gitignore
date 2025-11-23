@@ -1,0 +1,32 @@
+# ---------------------------
+# Node / NestJS
+# ---------------------------
+node_modules/
+dist/
+coverage/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Optional npm cache directory
+.npm/
+.pnpm-store/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Logs
+logs/
+*.log
+*.tmp
+*.pid
+*.seed
+*.pid.lock
+
+# NestJS cache
+.cache/
+.tmp/
+tsconfig.tsbuildinfo

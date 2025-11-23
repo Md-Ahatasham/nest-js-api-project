@@ -1,0 +1,90 @@
+apiVersion: apps/v1 # Kubernetes API version for Deployment resources
+kind: Deployment # We are creating a Deployment
+metadata:
+  name: { { include "my-nodejs-app.fullname" . } } # Deployment name generated from chart name + release name
+  labels:
+    app: { { include "my-nodejs-app.name" . } } # Label to identify application
+
+spec:
+  replicas: { { .Values.replicaCount } } # Number of pod replicas (comes from values.yaml)
+
+  selector: # Tells Deployment which pods it manages
+    matchLabels:
+      app: { { include "my-nodejs-app.name" . } } # Must match template.metadata.labels.app
+
+  template: # Pod template
+    metadata:
+      labels:
+        app: { { include "my-nodejs-app.name" . } } # Labels applied to pods; must match selector
+
+    spec:
+      serviceAccountName: { { include "my-nodejs-app.serviceAccountName" . } }
+      # Specifies the ServiceAccount the pod will use (RBAC best practice)
+
+      imagePullSecrets:
+        - name: { { .Values.imagePullSecret } } # Secret used to pull private images (DockerHub/GCR/ECR)
+
+      containers:
+        - name: nodejs # Name of container inside the pod
+
+          image: '{{ .Values.image.repository }}:{{ .Values.image.tag }}'
+          # Full image name → repo:tag (tag will come dynamically from Jenkins)
+
+          imagePullPolicy: { { .Values.image.pullPolicy } }
+          # "Always" for dev/CD → always pulls latest tag
+          # "IfNotPresent" for prod → uses local cache
+
+          ports:
+            - name: http
+              containerPort: { { .Values.containerPort } }
+              # Port your Node.js app listens on
+
+          envFrom:
+            - configMapRef:
+                name: { { include "my-nodejs-app.fullname" . } }
+              # Load ALL config values from ConfigMap
+
+            - secretRef:
+                name: { { include "my-nodejs-app.fullname" . } }
+              # Load ALL secrets securely (best practice in enterprise)
+
+          resources:
+            requests:
+              cpu: { { .Values.resources.requests.cpu } }
+              memory: { { .Values.resources.requests.memory } }
+              # Minimum guaranteed CPU/memory. Scheduler uses this.
+
+            limits:
+              cpu: { { .Values.resources.limits.cpu } }
+              memory: { { .Values.resources.limits.memory } }
+              # Hard limit: container cannot cross this.
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: { { .Values.containerPort } }
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            # Ensures Kubernetes restarts unhealthy container
+
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: { { .Values.containerPort } }
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            # Ensures pod is ready before receiving traffic
+
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1001
+            # Security best practice → run Node app as non-root user
+
+      nodeSelector: { { - toYaml .Values.nodeSelector | nindent 8 } }
+      # Assign pods to specific nodes if required
+
+      tolerations: { { - toYaml .Values.tolerations | nindent 8 } }
+      # Allows pods to run on tainted nodes (production-grade feature)
+
+      affinity: { { - toYaml .Values.affinity | nindent 8 } }
+      # Specifies pod placement rules (e.g., anti-affinity for HA)

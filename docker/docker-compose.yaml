@@ -1,0 +1,66 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16
+    # Official PostgreSQL 16 image
+    container_name: postgres-db
+    # Name of the container
+    restart: always
+    # Restart automatically on failure
+    environment:
+      # PostgreSQL requires these to initialize DB
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+    ports:
+      - "5433:5432"
+      # Expose DB to host (optional)
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - myapp-network
+      # Attach to external/custom network
+
+  nest-api:
+    container_name: nest-api-prod
+    # Name of the container
+    build:
+      context: ..
+      # Go to root folder
+      dockerfile: docker/Dockerfile
+      # Use Dockerfile inside docker/
+    image: nest-api:prod
+    # Image name for registry or server
+    restart: always
+    # Auto-restart on crash
+    # ports:
+    #   - "3000:3000" # Expose API
+    # environment:
+    #   NODE_ENV: production # Environment variable
+    #   PORT: 3000
+
+    env_file:
+      - .env
+        # Load all environment variables from .env
+    ports:
+      - "${NEST_PORT}:${NEST_PORT}"
+    networks:
+      - myapp-network
+
+    volumes:
+      - logs:/app/logs # Persist logs in volume
+    user: "1000:1000" # Run as non-root user (production best practice)
+
+# Persistent volume for PostgreSQL data
+volumes:
+  logs: # Named volume for logs
+  postgres_data:
+
+# Define external network
+networks:
+  myapp-network:
+    external: true
+    # Network is managed outside Compose
+    name: myapp-network
+    # Name of the existing network

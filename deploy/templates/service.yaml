@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: { { include "my-nodejs-app.fullname" . } }
+  labels:
+    app: { { include "my-nodejs-app.name" . } }
+spec:
+  type: { { .Values.service.type } } # ClusterIP / NodePort / LoadBalancer
+  ports:
+    - port: 80 # Service port
+      targetPort: { { .Values.containerPort } } # Maps to pod container port
+      protocol: TCP
+      name: http
+  selector:
+    app: { { include "my-nodejs-app.name" . } } # Target pods
