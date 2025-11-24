@@ -79,12 +79,3 @@ spec:
             runAsNonRoot: true
             runAsUser: 1001
             # Security best practice → run Node app as non-root user
-
-      nodeSelector: {{ - toYaml .Values.nodeSelector | nindent 8 }}
-      # Assign pods to specific nodes if required
-
-      tolerations: {{ - toYaml .Values.tolerations | nindent 8 }}
-      # Allows pods to run on tainted nodes (production-grade feature)
-
-      affinity: {{ - toYaml .Values.affinity | nindent 8 }}
-      # Specifies pod placement rules (e.g., anti-affinity for HA)

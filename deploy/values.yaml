@@ -36,13 +36,6 @@ secrets:
   DB_PASSWORD: "changeme"
   API_KEY: "changeme"
 
-# Node affinity, anti-affinity, and advanced scheduling
-nodeSelector: {}
-
-tolerations: []
-
-affinity: {}
-
 # RBAC configuration
 serviceAccount:
   create: true
