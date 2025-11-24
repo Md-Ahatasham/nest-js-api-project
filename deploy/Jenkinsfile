@@ -71,11 +71,13 @@ pipeline {
             steps {
                 withCredentials([file(credentialsId: 'kubeconfig-prod', variable: 'KUBECONFIG_FILE')]) {
                     sh """
-                    helm upgrade --install my-nodejs-app ${HELM_CHART_PATH} \
-                      --namespace ${K8S_NAMESPACE} \
-                      --set image.repository=${DOCKER_IMAGE} \
-                      --set image.tag=${IMAGE_TAG} \
-                      --wait
+                        export KUBECONFIG=$KUBECONFIG_FILE
+                        kubectl get nodes   # test connectivity first
+                        helm upgrade --install my-nodejs-app ${HELM_CHART_PATH} \
+                        --namespace ${K8S_NAMESPACE} \
+                        --set image.repository=${DOCKER_IMAGE} \
+                        --set image.tag=${IMAGE_TAG} \
+                        --wait
                     """
                 }
             }
