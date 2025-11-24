@@ -54,18 +54,30 @@ pipeline {
         }
 
         stage('Deploy to Kubernetes') {
+            // steps {
+            //     // Use Helm to deploy or upgrade your app in Kubernetes
+            //     // --install: install if not present, upgrade if already exists
+            //     // --set: dynamically override values in values.yaml
+            //     // --wait: wait until all resources are ready
+            //     sh """
+            //     helm upgrade --install my-nodejs-app ${HELM_CHART_PATH} \
+            //       --namespace ${K8S_NAMESPACE} \
+            //       --set image.repository=${DOCKER_IMAGE} \
+            //       --set image.tag=${IMAGE_TAG} \
+            //       --wait
+            //     """
+            // }
+            
             steps {
-                // Use Helm to deploy or upgrade your app in Kubernetes
-                // --install: install if not present, upgrade if already exists
-                // --set: dynamically override values in values.yaml
-                // --wait: wait until all resources are ready
-                sh """
-                helm upgrade --install my-nodejs-app ${HELM_CHART_PATH} \
-                  --namespace ${K8S_NAMESPACE} \
-                  --set image.repository=${DOCKER_IMAGE} \
-                  --set image.tag=${IMAGE_TAG} \
-                  --wait
-                """
+                withCredentials([file(credentialsId: 'kubeconfig-prod', variable: 'KUBECONFIG_FILE')]) {
+                    sh """
+                    helm upgrade --install my-nodejs-app ${HELM_CHART_PATH} \
+                      --namespace ${K8S_NAMESPACE} \
+                      --set image.repository=${DOCKER_IMAGE} \
+                      --set image.tag=${IMAGE_TAG} \
+                      --wait
+                    """
+                }
             }
         }
     }
