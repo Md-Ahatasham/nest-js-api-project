@@ -25,9 +25,9 @@ spec:
         - name: { { .Values.imagePullSecret } } # Secret used to pull private images (DockerHub/GCR/ECR)
 
       containers:
-        - name: nodejs # Name of container inside the pod
+        - name: nest-nodejs # Name of container inside the pod
 
-          image: '{{ .Values.image.repository }}:{{ .Values.image.tag }}'
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           # Full image name → repo:tag (tag will come dynamically from Jenkins)
 
           imagePullPolicy: { { .Values.image.pullPolicy } }

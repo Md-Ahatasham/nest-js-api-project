@@ -1,0 +1,86 @@
+pipeline {
+    agent any  // Run this pipeline on any available Jenkins agent/node
+
+    environment {
+        // Docker Hub credentials ID stored in Jenkins
+        DOCKER_CREDENTIALS_ID = 'dockerhub-creds' 
+
+        // Docker image repository (your Docker Hub username + repo)
+        DOCKER_IMAGE = 'ahatashamcsecu/nest-js-api-project' 
+
+        // Kubernetes namespace where the app will be deployed
+        K8S_NAMESPACE = 'default' 
+
+        // Path to Helm chart in repo
+        HELM_CHART_PATH = './charts' 
+
+        // Image tag for Docker image; using Jenkins build number ensures unique version
+        IMAGE_TAG = "${env.BUILD_NUMBER}" 
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout source code from master branch of your GitHub repository
+                git branch: 'master', url: 'https://github.com/Md-Ahatasham/nest-js-api-project.git'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                // Build Docker image locally using Dockerfile in repo
+                // Tag the image as <repository>:<build_number>
+                sh "docker build -t ${DOCKER_IMAGE}:${IMAGE_TAG} ."
+            }
+        }
+
+        stage('Login to Docker Hub') {
+            steps {
+                // Use Jenkins credentials to login to Docker Hub
+                // withCredentials injects username/password as environment variables
+                withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    // Login to Docker Hub securely using password from credentials
+                    sh "echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin"
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                // Push the Docker image to Docker Hub
+                sh "docker push ${DOCKER_IMAGE}:${IMAGE_TAG}"
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                // Use Helm to deploy or upgrade your app in Kubernetes
+                // --install: install if not present, upgrade if already exists
+                // --set: dynamically override values in values.yaml
+                // --wait: wait until all resources are ready
+                sh """
+                helm upgrade --install my-nodejs-app ${HELM_CHART_PATH} \
+                  --namespace ${K8S_NAMESPACE} \
+                  --set image.repository=${DOCKER_IMAGE} \
+                  --set image.tag=${IMAGE_TAG} \
+                  --wait
+                """
+            }
+        }
+    }
+
+    post {
+        always {
+            // Ensure Docker logout happens no matter success/failure
+            sh 'docker logout'
+        }
+        success {
+            // Notify in Jenkins console that deployment was successful
+            echo "Deployment successful: ${DOCKER_IMAGE}:${IMAGE_TAG}"
+        }
+        failure {
+            // Notify in Jenkins console that deployment failed
+            echo "Deployment failed!"
+        }
+    }
+}
