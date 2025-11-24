@@ -30,7 +30,8 @@ pipeline {
             steps {
                 // Build Docker image locally using Dockerfile in repo
                 // Tag the image as <repository>:<build_number>
-                sh "docker build -t ${DOCKER_IMAGE}:${IMAGE_TAG} ."
+                //sh "docker build -t ${DOCKER_IMAGE}:${IMAGE_TAG} ."
+                sh "docker build -t ${DOCKER_IMAGE}:${IMAGE_TAG} -f docker/Dockerfile ."
             }
         }
 
