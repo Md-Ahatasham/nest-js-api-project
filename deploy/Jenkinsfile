@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         // Docker Hub credentials ID stored in Jenkins
-        DOCKER_CREDENTIALS_ID = 'dockerhub-creds' 
+        DOCKER_CREDENTIALS_ID = 'dockerhub-cred' 
 
         // Docker image repository (your Docker Hub username + repo)
         DOCKER_IMAGE = 'ahatashamcsecu/nest-js-api-project' 
