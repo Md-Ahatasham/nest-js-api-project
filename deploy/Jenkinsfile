@@ -75,7 +75,7 @@ pipeline {
                         echo "Current workspace: $WORKSPACE"
                         ls -la $WORKSPACE/deploy
                         kubectl get nodes
-                        helm upgrade --install my-nodejs-app $WORKSPACE/deploy/charts \
+                        helm upgrade --install my-nodejs-app $WORKSPACE/deploy \
                         --namespace default \
                         --set image.repository=${DOCKER_IMAGE} \
                         --set image.tag=${IMAGE_TAG} \
