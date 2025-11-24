@@ -1,18 +1,18 @@
 apiVersion: autoscaling/v2 # Using autoscaling/v2 to support CPU/memory/custom metrics
 kind: HorizontalPodAutoscaler # Defines this object as a Horizontal Pod Autoscaler
 metadata:
-  name: { { include "my-nodejs-app.fullname" . } } # HPA name dynamically generated from Helm chart
+  name: {{ include "my-nodejs-app.fullname" . }} # HPA name dynamically generated from Helm chart
 spec:
   scaleTargetRef:
     apiVersion: apps/v1 # Target resource API version (Deployment uses apps/v1)
     kind: Deployment # Type of target resource (Deployment in this case)
-    name: { { include "my-nodejs-app.fullname" . } } # The deployment this HPA will scale
-  minReplicas: { { .Values.hpa.minReplicas } } # Minimum number of pods to always run
-  maxReplicas: { { .Values.hpa.maxReplicas } } # Maximum number of pods HPA can scale to
+    name: {{ include "my-nodejs-app.fullname" . }} # The deployment this HPA will scale
+  minReplicas: {{ .Values.hpa.minReplicas }} # Minimum number of pods to always run
+  maxReplicas: {{ .Values.hpa.maxReplicas }} # Maximum number of pods HPA can scale to
   metrics: # Define which metrics HPA should monitor
     - type: Resource # Standard Kubernetes resource metric
       resource:
         name: cpu # Using CPU utilization as the metric to scale
         target:
           type: Utilization # Target is average utilization across pods
-          averageUtilization: { { .Values.hpa.targetCPUUtilizationPercentage } } # Target CPU % (e.g., 50%)
+          averageUtilization: {{ .Values.hpa.targetCPUUtilizationPercentage }} # Target CPU % (e.g., 50%)
