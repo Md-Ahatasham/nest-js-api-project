@@ -72,9 +72,11 @@ pipeline {
                 withCredentials([file(credentialsId: 'kubeconfig-prod', variable: 'KUBECONFIG_FILE')]) {
                     sh """
                         export KUBECONFIG=$KUBECONFIG_FILE
-                        kubectl get nodes   # test connectivity first
-                        helm upgrade --install my-nodejs-app ${HELM_CHART_PATH} \
-                        --namespace ${K8S_NAMESPACE} \
+                        echo "Current workspace: $WORKSPACE"
+                        ls -la $WORKSPACE/deploy
+                        kubectl get nodes
+                        helm upgrade --install my-nodejs-app $WORKSPACE/deploy/charts \
+                        --namespace default \
                         --set image.repository=${DOCKER_IMAGE} \
                         --set image.tag=${IMAGE_TAG} \
                         --wait
