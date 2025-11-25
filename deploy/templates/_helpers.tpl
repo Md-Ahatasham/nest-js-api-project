@@ -1,16 +1,14 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "..name" -}}
+{{- define "my-nodejs-app.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
-Create a default fully qualified app name.
-We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
-If release name contains chart name it will be used as a full name.
+Create a fully qualified app name.
 */}}
-{{- define "..fullname" -}}
+{{- define "my-nodejs-app.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -24,18 +22,18 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 
 {{/*
-Create chart name and version as used by the chart label.
+Chart label
 */}}
-{{- define "..chart" -}}
+{{- define "my-nodejs-app.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "..labels" -}}
-helm.sh/chart: {{ include "..chart" . }}
-{{ include "..selectorLabels" . }}
+{{- define "my-nodejs-app.labels" -}}
+helm.sh/chart: {{ include "my-nodejs-app.chart" . }}
+{{ include "my-nodejs-app.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -45,17 +43,17 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "..selectorLabels" -}}
-app.kubernetes.io/name: {{ include "..name" . }}
+{{- define "my-nodejs-app.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "my-nodejs-app.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
-Create the name of the service account to use
+Service account
 */}}
-{{- define "..serviceAccountName" -}}
+{{- define "my-nodejs-app.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "..fullname" .) .Values.serviceAccount.name }}
+{{- default (include "my-nodejs-app.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
