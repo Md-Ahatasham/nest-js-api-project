@@ -6,7 +6,7 @@ Expand the name of the chart.
 {{- end }}
 
 {{/*
-Create a fully qualified app name.
+Create a default fully qualified app name.
 */}}
 {{- define "my-nodejs-app.fullname" -}}
 {{- if .Values.fullnameOverride }}
@@ -22,7 +22,7 @@ Create a fully qualified app name.
 {{- end }}
 
 {{/*
-Chart label
+Chart name and version label
 */}}
 {{- define "my-nodejs-app.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
@@ -49,7 +49,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
-Service account
+Service Account Name
 */}}
 {{- define "my-nodejs-app.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
