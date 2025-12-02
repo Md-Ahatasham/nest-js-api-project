@@ -3,5 +3,5 @@ kind: ConfigMap
 metadata:
   name: {{ include "my-nodejs-app.fullname" . }}
 data:
-  NODE_ENV: {{ .Values.env.NODE_ENV | quote }} # Example config
+  NODE_ENV: {{ .Values.config.NODE_ENV | quote }} # Example config
   APP_PORT: {{ .Values.containerPort | quote }}
