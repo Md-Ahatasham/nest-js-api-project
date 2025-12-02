@@ -66,11 +66,11 @@ hpa:
   targetCPUUtilizationPercentage: 50
 
 db:
-  host: postgres
-  port: 5432
-  username: postgres
-  password: secret
-  database: myappdb
+  host: "postgres"
+  port: "5432"
+  username: "postgres"
+  password: "secret"
+  database: "myappdb"
 
 httpRoute:
   enabled: false
